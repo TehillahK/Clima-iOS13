@@ -7,3 +7,16 @@
 //
 
 import Foundation
+let env = ProcessInfo.processInfo.environment
+struct WeatherLogic{
+    var city = ""
+    let API_KEY = env["OPEN_WEATHER_API_KEY"] ?? "failed"
+
+    mutating func getWeatherInfo(city: String){
+        self.city = city
+        let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(API_KEY)"
+        
+        print(apiUrl)
+    }
+    
+}
