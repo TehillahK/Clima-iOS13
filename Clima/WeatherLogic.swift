@@ -8,9 +8,18 @@
 
 import Foundation
 let env = ProcessInfo.processInfo.environment
+
+protocol WeatherManagerDelegate {
+    
+    func didUpdateWeather(manager: WeatherLogic,weather: WeatherModel)
+    
+    func didFailWithError(error: Error)
+}
+
 struct WeatherLogic{
     var city = ""
     let API_KEY = env["OPEN_WEATHER_API_KEY"] ?? "failed"
+    var delegate: WeatherManagerDelegate?
 
     func getWeatherInfo(city: String){
       //  self.city = city
@@ -24,12 +33,18 @@ struct WeatherLogic{
             (data: Data?, response:URLResponse?, error:Error? ) in
             if(error != nil){
                 print(error!)
+                self.delegate?.didFailWithError(error:error! )
                 return
             }
             
             if let safeData = data{
                // let dataString = String(data: safeData, encoding: .utf8)
-                self.parseJson(safeData)
+               let weatherData = self.parseJson(safeData)
+                
+                if let safeWeatherModel = weatherData{
+                    let weather = createWeatherModel(safeWeatherModel)
+                    self.delegate?.didUpdateWeather(manager: self,weather: weather)
+                }
             }
         })
         
@@ -38,14 +53,25 @@ struct WeatherLogic{
         
     }
     
-    func parseJson(_ jsonString: Data){
+    func parseJson(_ jsonString: Data) -> WeatherData?{
         let decoder = JSONDecoder()
         do{
             let decodedData = try decoder.decode(WeatherData.self, from: jsonString)
-            print("temp\(decodedData.main.temp)")
+           // print("temp\(decodedData.main.temp)")
+            return decodedData
+            
         }catch{
-            print(error)
+            print("PARSE Error:\(error)")
+            self.delegate?.didFailWithError(error:error )
+            return nil
         }
+        
+    }
+    
+    func createWeatherModel(_ weatherData: WeatherData) -> WeatherModel{
+       // var result: WeatherModel? = nil
+        
+        return WeatherModel(conditionID: weatherData.weather[0].id, cityName: weatherData.name, temperature: weatherData.main.temp)
         
     }
     
