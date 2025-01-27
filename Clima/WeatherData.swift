@@ -12,6 +12,7 @@ import Foundation
 struct WeatherData: Decodable {
     let name: String
     let main: Main
+    let weather: [Weather]
    
 }
 
@@ -21,6 +22,7 @@ struct Clouds: Codable {
 
 struct Main: Codable {
     let temp: Double
+    let feels_like: Double
    
 }
 
