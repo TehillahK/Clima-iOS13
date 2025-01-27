@@ -23,7 +23,7 @@ struct WeatherLogic{
 
     func getWeatherInfo(city: String){
       //  self.city = city
-        let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(API_KEY)"
+        let apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(API_KEY)&units=metric"
         
         let url = URL(string: apiUrl)
         
