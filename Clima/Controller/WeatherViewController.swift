@@ -23,14 +23,14 @@ class WeatherViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
-        
-        self.searchTextField.delegate = self
-        self.weatherLogic.delegate = self
         self.coreLocation.delegate = self
         
         self.coreLocation.requestWhenInUseAuthorization()
         self.coreLocation.requestLocation()
+        
+        self.searchTextField.delegate = self
+        self.weatherLogic.delegate = self
+       
     }
 
     @IBAction func searchBtnPressed(_ sender: UIButton) {
@@ -44,10 +44,6 @@ class WeatherViewController: UIViewController{
     }
     
     
-    
-  
-    
-    
 }
 
 
@@ -56,6 +52,11 @@ class WeatherViewController: UIViewController{
 extension WeatherViewController: UITextFieldDelegate{
     // runs if they press go or ok in on screen keyboard
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+      
+        let userInput = textField.text!
+        weatherLogic.getWeatherInfo(city: userInput)
+        textField.resignFirstResponder()
+        
         return true
     }
     
@@ -64,6 +65,10 @@ extension WeatherViewController: UITextFieldDelegate{
     }
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if textField.text!.isEmpty{
+            return false
+        }
+        textField.resignFirstResponder()
         return true
     }
 
