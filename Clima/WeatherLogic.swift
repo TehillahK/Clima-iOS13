@@ -20,6 +20,37 @@ struct WeatherLogic{
     var city = ""
     let API_KEY = env["OPEN_WEATHER_API_KEY"] ?? "failed"
     var delegate: WeatherManagerDelegate?
+    
+    func getWeatherInfo(lat: Double,long: Double){
+        let apiUrl = "https://api.openweathermap.org/data/2.5/weather?lat=\(lat)&lon=\(long)&appid=\(API_KEY)&units=metric"
+        
+        let url = URL(string: apiUrl)
+        
+        let session = URLSession(configuration: .default)
+        
+        let task = session.dataTask(with: url! ,completionHandler: {
+            (data: Data?, response:URLResponse?, error:Error? ) in
+            if(error != nil){
+                print(error!)
+                self.delegate?.didFailWithError(error:error! )
+                return
+            }
+            
+            if let safeData = data{
+               // let dataString = String(data: safeData, encoding: .utf8)
+               let weatherData = self.parseJson(safeData)
+                
+                if let safeWeatherModel = weatherData{
+                    let weather = createWeatherModel(safeWeatherModel)
+                    self.delegate?.didUpdateWeather(manager: self,weather: weather)
+                }
+            }
+        })
+        
+        task.resume()
+        
+        
+    }
 
     func getWeatherInfo(city: String){
       //  self.city = city
